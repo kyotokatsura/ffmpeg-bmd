@@ -31,8 +31,13 @@ jobs:
         run: |
           cd ffmpeg-src
           BREW_PREFIX="$(brew --prefix)"
+          export SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+          export CC="$(xcrun -find clang)"
+          export CXX="$(xcrun -find clang++)"
           ./configure \
             --prefix=/tmp/ffmpeg-install \
+            --cc="$CC" \
+            --cxx="$CXX" \
             --disable-shared \
             --enable-version3 \
             --disable-gpl \
@@ -51,8 +56,9 @@ jobs:
             --disable-libjack \
             --disable-indev=jack \
             --enable-decklink \
-            --extra-cflags="-I${BREW_PREFIX}/include" \
-            --extra-ldflags="-L${BREW_PREFIX}/lib"
+            --extra-cflags="-I${BREW_PREFIX}/include -isysroot ${SDKROOT}" \
+            --extra-cxxflags="-isysroot ${SDKROOT}" \
+            --extra-ldflags="-L${BREW_PREFIX}/lib -isysroot ${SDKROOT}"
           make -j$(sysctl -n hw.ncpu)
           make install
 
