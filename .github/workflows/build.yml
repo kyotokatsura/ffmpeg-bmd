@@ -1,0 +1,29 @@
+name: Build ffmpegdecklink
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15-intel
+    steps:
+      - name: Set deployment target for Ventura compatibility
+        run: echo "MACOSX_DEPLOYMENT_TARGET=13.0" >> "$GITHUB_ENV"
+
+      - name: Trust and install ffmpegdecklink
+        run: |
+          brew tap amiaopensource/amiaos
+          brew trust amiaopensource/amiaos
+          brew install amiaopensource/amiaos/ffmpegdecklink
+
+      - name: Package artifact
+        run: |
+          mkdir -p /tmp/artifact
+          cp -R "$(brew --prefix ffmpegdecklink)" /tmp/artifact/ffmpegdecklink
+          tar -czf /tmp/ffmpegdecklink-macos-intel.tar.gz -C /tmp/artifact ffmpegdecklink
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpegdecklink-macos-intel
+          path: /tmp/ffmpegdecklink-macos-intel.tar.gz
