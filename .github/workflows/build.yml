@@ -1,8 +1,6 @@
 name: Build ffmpegdecklink
-
 on:
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: macos-15-intel
@@ -14,20 +12,17 @@ jobs:
           brew install nasm pkg-config texinfo
           brew install fontconfig freetype harfbuzz lame libvorbis libvpx openh264 openjpeg opus sdl2 snappy theora xz
           brew install amiaopensource/amiaos/decklinksdk
-
       - name: Download FFmpeg source
         run: |
           curl -L -o ffmpeg.tar.xz https://ffmpeg.org/releases/ffmpeg-8.0.tar.xz
           tar xf ffmpeg.tar.xz
           mv ffmpeg-8.0 ffmpeg-src
-
       - name: Apply DeckLink SDK 15 compatibility patch
         run: |
           curl -L -o decklink-sdk15-compat.patch https://raw.githubusercontent.com/nt74/rocky9-installers/main/patch/ffmpeg-decklink-sdk15-compat.patch
           cd ffmpeg-src
           patch -p1 --fuzz=3 < ../decklink-sdk15-compat.patch
-
-- name: Configure and build FFmpeg with DeckLink
+      - name: Configure and build FFmpeg with DeckLink
         run: |
           cd ffmpeg-src
           BREW_PREFIX="$(brew --prefix)"
@@ -61,14 +56,12 @@ jobs:
             --extra-ldflags="-L${BREW_PREFIX}/lib -isysroot ${SDKROOT}"
           make -j$(sysctl -n hw.ncpu)
           make install
-
       - name: Rename and package artifact
         run: |
           mkdir -p /tmp/artifact/bin
           cp /tmp/ffmpeg-install/bin/ffmpeg /tmp/artifact/bin/ffmpeg-dl
           cp /tmp/ffmpeg-install/bin/ffprobe /tmp/artifact/bin/ffprobe-dl
           tar -czf /tmp/ffmpegdecklink-macos-intel.tar.gz -C /tmp/artifact bin
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
