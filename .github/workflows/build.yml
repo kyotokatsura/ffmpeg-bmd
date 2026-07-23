@@ -22,6 +22,7 @@ jobs:
           curl -L -o decklink-sdk15-compat.patch https://raw.githubusercontent.com/nt74/rocky9-installers/main/patch/ffmpeg-decklink-sdk15-compat.patch
           cd ffmpeg-src
           patch -p1 --fuzz=3 < ../decklink-sdk15-compat.patch
+          mv VERSION VERSION.txt
       - name: Configure and build FFmpeg with DeckLink
         run: |
           cd ffmpeg-src
