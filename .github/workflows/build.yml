@@ -27,7 +27,7 @@ jobs:
           cd ffmpeg-src
           patch -p1 --fuzz=3 < ../decklink-sdk15-compat.patch
 
-      - name: Configure and build FFmpeg with DeckLink
+- name: Configure and build FFmpeg with DeckLink
         run: |
           cd ffmpeg-src
           BREW_PREFIX="$(brew --prefix)"
